@@ -1,0 +1,13 @@
+[project]
+name = "playground-vibevoice-asr"
+version = "0.1.0"
+description = "Experimental repo for evaluating VibeVoice-ASR local transcription and diarization"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+    "ruff>=0.15.8",
+]
