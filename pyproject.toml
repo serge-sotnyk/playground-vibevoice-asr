@@ -4,10 +4,39 @@ version = "0.1.0"
 description = "Experimental repo for evaluating VibeVoice-ASR local transcription and diarization"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "accelerate>=1.11.0",
+    "bitsandbytes>=0.48.1",
+    "librosa>=0.11.0",
+    "torch>=2.9.0",
+    "transformers>=5.3.0",
+]
+
+[project.scripts]
+vv-trans = "playground_vibevoice_asr.cli:main"
 
 [dependency-groups]
 dev = [
     "pytest>=9.0.2",
     "ruff>=0.15.8",
 ]
+
+[build-system]
+requires = ["hatchling>=1.27.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/playground_vibevoice_asr"]
+
+[tool.ruff]
+target-version = "py313"
+
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cu128", marker = "sys_platform == 'win32' or sys_platform == 'linux'" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true

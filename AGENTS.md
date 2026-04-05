@@ -9,11 +9,8 @@
 ## Commands
 
 ```bash
-# Install dependencies
+# Install dependencies (PyTorch CUDA index is selected automatically on Windows/Linux)
 uv sync
-
-# Install PyTorch with CUDA support (run once after uv sync)
-uv pip install torch --index-url https://download.pytorch.org/whl/cu126
 
 # Run tests
 uv run pytest
@@ -50,6 +47,6 @@ uv run ruff format .
 ## Development Notes
 
 - Local execution only, Windows workstation with RTX 3090
-- PyTorch must be installed with CUDA support from the PyTorch index
+- PyTorch CUDA index is selected automatically via environment markers (Win/Linux → cu128, macOS → PyPI with MPS)
 - bitsandbytes bundles its own CUDA binaries (no system CUDA dependency for bnb itself)
 - Use MCP context7 for up-to-date library documentation
