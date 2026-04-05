@@ -17,9 +17,10 @@ from playground_vibevoice_asr.output_schema import TranscriptOutput, TranscriptS
 DEFAULT_MODEL_ID = "microsoft/VibeVoice-ASR-HF"
 
 RUNTIME_4 = "4"
-RUNTIME_8 = "8"
+RUNTIME_8 = "8"       # TorchAO Int8WeightOnly
+RUNTIME_8Q = "8q"     # Quanto INT8
 RUNTIME_16 = "16"
-SUPPORTED_RUNTIMES = [RUNTIME_4, RUNTIME_8, RUNTIME_16]
+SUPPORTED_RUNTIMES = [RUNTIME_4, RUNTIME_8, RUNTIME_8Q, RUNTIME_16]
 
 SAMPLE_RATE = 24000  # VibeVoice native sample rate
 
@@ -62,11 +63,24 @@ def load_model(
             quantization_config=quantization_config,
         )
     elif runtime == RUNTIME_8:
-        quantization_config = BitsAndBytesConfig(load_in_8bit=True)
+        from torchao.quantization import Int8WeightOnlyConfig as TorchaoInt8Config
+        from transformers import TorchAoConfig
+
+        quantization_config = TorchAoConfig(quant_type=TorchaoInt8Config())
         model = VibeVoiceAsrForConditionalGeneration.from_pretrained(
             model_id,
             device_map="auto",
-            dtype=torch.bfloat16,
+            torch_dtype=torch.bfloat16,
+            quantization_config=quantization_config,
+        )
+    elif runtime == RUNTIME_8Q:
+        from transformers import QuantoConfig
+
+        quantization_config = QuantoConfig(weights="int8")
+        model = VibeVoiceAsrForConditionalGeneration.from_pretrained(
+            model_id,
+            device_map="auto",
+            torch_dtype=torch.bfloat16,
             quantization_config=quantization_config,
         )
     else:  # RUNTIME_16
@@ -84,7 +98,9 @@ def _quantization_type(runtime: str) -> str | None:
     if runtime == RUNTIME_4:
         return "nf4"
     if runtime == RUNTIME_8:
-        return "int8"
+        return "int8-torchao"
+    if runtime == RUNTIME_8Q:
+        return "int8-quanto"
     return None
 
 

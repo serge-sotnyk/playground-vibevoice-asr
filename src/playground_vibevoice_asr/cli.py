@@ -30,35 +30,37 @@ def find_audio_files(directory: Path) -> list[Path]:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Transcribe audio with VibeVoice-ASR")
     parser.add_argument(
-        "--audio",
-        required=True,
+        "audio",
         help="Local audio path, remote URL, or directory of audio files",
     )
     parser.add_argument(
-        "--output",
+        "-o", "--output",
         help="Output JSON path. Defaults to <audio>.trans.<runtime>.json for local files",
     )
-    parser.add_argument("--prompt", help="Optional prompt to guide transcription")
     parser.add_argument(
-        "--runtime",
+        "-p", "--prompt",
+        help="Optional prompt to guide transcription",
+    )
+    parser.add_argument(
+        "-r", "--runtime",
         choices=SUPPORTED_RUNTIMES,
         default=RUNTIME_4,
         help="Runtime mode (default: 4)",
     )
     parser.add_argument(
-        "--model-id",
+        "-m", "--model-id",
         default=DEFAULT_MODEL_ID,
         help="Hugging Face model identifier",
     )
     parser.add_argument(
-        "--chunk-seconds",
+        "-c", "--chunk-seconds",
         type=int,
         help="Audio chunk size in seconds for model.generate(). "
         "Smaller chunks use less VRAM but run slower. "
         "Default: model default (60s)",
     )
     parser.add_argument(
-        "--force",
+        "-f", "--force",
         action="store_true",
         help="Overwrite existing output files (batch mode)",
     )
