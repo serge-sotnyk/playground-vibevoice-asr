@@ -29,8 +29,8 @@ class TranscriptOutput:
         return payload
 
 
-def default_output_path(audio: str) -> Path:
+def default_output_path(audio: str, runtime: str) -> Path:
     audio_path = Path(audio)
     if not audio_path.exists():
         raise ValueError("--output is required when --audio is not a local file path")
-    return audio_path.with_name(f"{audio_path.name}.trans.json")
+    return audio_path.with_name(f"{audio_path.name}.trans.{runtime}.json")

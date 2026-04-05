@@ -29,9 +29,15 @@ uv run ruff format .
 ├── README.md
 ├── docs/
 │   ├── vibevoice_asr_experiment_plan.md   # Experiment specification
+│   ├── experiment_results.md              # Runtime comparison results
 │   ├── commands/                          # AI workflow command templates
 │   └── features/                          # Feature plans
-└── src/                                   # Source code (TBD)
+└── src/
+    └── playground_vibevoice_asr/
+        ├── __init__.py
+        ├── cli.py                         # CLI entry point (vv-trans)
+        ├── output_schema.py               # Output dataclasses
+        └── transcribe.py                  # Model loading and transcription
 ```
 
 ## Code Style
