@@ -30,6 +30,13 @@ Audio: 5 files (EN, RU), 10–20 seconds each, no prompt
 
 - **bitsandbytes INT8** (`BitsAndBytesConfig(load_in_8bit=True)`): broken for this model. Emits `MatMul8bitLt: inputs will be cast from torch.bfloat16 to float16` — the bf16→fp16 cast causes numerical issues. Output is either `[Unintelligible Speech]` or a hallucination loop. Replaced with TorchAO and Quanto.
 
+### Known limitations
+
+- **Long audio files (>10 min)**: KV cache of the language model (Qwen2) grows linearly during generation and quickly exceeds 24 GB VRAM. A 30-min file in 4-bit mode consumed ~84 GB total GPU memory (spilling to system RAM via PCIe), making inference extremely slow. The `-c` (chunk-seconds) flag only controls the tokenizer stage, not the LM generation.
+- **QuantizedCache** (KV cache quantization) is not supported for encoder-decoder models like VibeVoice-ASR.
+- **Sliding window attention** is disabled in the model config (`sliding_window: None`); enabling it post-hoc risks quality degradation.
+- **Future direction**: audio-level splitting (5-min segments with overlap + speaker matching) or vLLM with paged attention.
+
 ### Conclusion
 
-Use **4-bit** as the default runtime (lowest VRAM). Use **16-bit** when VRAM allows and speed matters. For 8-bit, use **TorchAO** (`-r 8`) as the faster option or **Quanto** (`-r 8q`) for macOS.
+Use **4-bit** as the default runtime (lowest VRAM). Use **16-bit** when VRAM allows and speed matters. For 8-bit, use **TorchAO** (`-r 8`) as the faster option or **Quanto** (`-r 8q`) for macOS. Practical limit for single-pass processing on RTX 3090: ~10 minutes of audio.

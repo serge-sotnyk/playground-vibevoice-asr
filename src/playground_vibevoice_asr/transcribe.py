@@ -121,7 +121,7 @@ def transcribe_audio(
 
     generate_kwargs: dict[str, Any] = dict(inputs)
     if chunk_seconds is not None:
-        generate_kwargs["tokenizer_chunk_size"] = chunk_seconds * SAMPLE_RATE
+        generate_kwargs["acoustic_tokenizer_chunk_size"] = chunk_seconds * SAMPLE_RATE
 
     output_ids = model.generate(**generate_kwargs)
     generated_ids = output_ids[:, inputs["input_ids"].shape[1] :]
