@@ -4,15 +4,11 @@ import argparse
 import sys
 from pathlib import Path
 
-from playground_vibevoice_asr.output_schema import default_output_path
-from playground_vibevoice_asr.transcribe import (
-    DEFAULT_MODEL_ID,
-    SUPPORTED_RUNTIMES,
-    RUNTIME_4,
-    load_model,
-    transcribe_audio,
-    write_transcript,
-)
+# Constants duplicated here to avoid importing torch/transformers at parse time.
+# Keep in sync with transcribe.py.
+_DEFAULT_MODEL_ID = "microsoft/VibeVoice-ASR-HF"
+_SUPPORTED_RUNTIMES = ["4", "8", "8q", "16"]
+_DEFAULT_RUNTIME = "4"
 
 AUDIO_EXTENSIONS = {".mp3", ".wav", ".m4a", ".flac"}
 
@@ -43,13 +39,13 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "-r", "--runtime",
-        choices=SUPPORTED_RUNTIMES,
-        default=RUNTIME_4,
+        choices=_SUPPORTED_RUNTIMES,
+        default=_DEFAULT_RUNTIME,
         help="Runtime mode (default: 4)",
     )
     parser.add_argument(
         "-m", "--model-id",
-        default=DEFAULT_MODEL_ID,
+        default=_DEFAULT_MODEL_ID,
         help="Hugging Face model identifier",
     )
     parser.add_argument(
@@ -68,6 +64,13 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def _process_single(args: argparse.Namespace) -> None:
+    from playground_vibevoice_asr.output_schema import default_output_path
+    from playground_vibevoice_asr.transcribe import (
+        load_model,
+        transcribe_audio,
+        write_transcript,
+    )
+
     model, processor, load_time = load_model(args.runtime, args.model_id)
     output_path = (
         Path(args.output)
@@ -97,6 +100,13 @@ def _process_directory(args: argparse.Namespace) -> None:
     if not audio_files:
         print(f"No audio files found in {audio_dir}", file=sys.stderr)
         sys.exit(1)
+
+    from playground_vibevoice_asr.output_schema import default_output_path
+    from playground_vibevoice_asr.transcribe import (
+        load_model,
+        transcribe_audio,
+        write_transcript,
+    )
 
     print(f"Found {len(audio_files)} audio file(s) in {audio_dir}")
     model, processor, load_time = load_model(args.runtime, args.model_id)
